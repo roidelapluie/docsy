@@ -1,6 +1,7 @@
 {{ with .Site.Params.gcs_engine_id }}
- <input type="search" class="form-control td-search-input" placeholder="&#xf002 {{ T "ui_search" }}" aria-label="{{ T "ui_search" }}" autocomplete="off">
+<input type="search" class="form-control td-search-input" placeholder="&#xf002 {{ T "ui_search" }}" aria-label="{{ T "ui_search" }}" autocomplete="off">
 {{ end }}
-{{ with .Site.Params.lunr }}
- <input type="search" class="form-control td-search-input" placeholder="&#xf002 {{ T "ui_search" }}" aria-label="{{ T "ui_search" }}" autocomplete="off">
+{{ with .Site.Params.offlineSearch }}
+<input type="search" id="search-input" class="form-control td-search-input" placeholder="&#xf002 {{ T "ui_search" }}" autocomplete="on">
+<div id="search-results" class="container"></div>
 {{ end }}
