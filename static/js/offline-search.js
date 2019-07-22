@@ -1,11 +1,11 @@
-// Code by Matt Walters https://www.mattwalters.net/posts/hugo-and-lunr/
+// Adapted from code by Matt Walters https://www.mattwalters.net/posts/hugo-and-lunr/
 
 var idx = null;         // Lunr index
 var resultDetails = []; // Will hold the data for the search results (titles and summaries)
-var $searchResults;     // The element on the page holding search results
-var $searchInput;       // The search box element
+var $searchInput;       // The search box element in the navbar
+var $searchResults;     // Results shown in the navbar
 
-window.onload = function () {
+$(window).on('load', function() {
     // Set up for an Ajax call to request the JSON data file that is created by
     // Hugo's build process, with the template we added above
     var request = new XMLHttpRequest();
@@ -20,11 +20,11 @@ window.onload = function () {
     request.onload = function() {
     if (request.status >= 200 && request.status < 400) {
         // Success response received in requesting the index.json file
-        var documents = JSON.parse(request.responseText);
+        var searchDocuments = JSON.parse(request.responseText);
 
         // Build the index so Lunr can search it.  The `ref` field will hold the URL
         // to the page/post.  title, excerpt, and body will be fields searched.
-        idx = lunr(function () {
+        idx = lunr(function lunrIndex() {
         this.ref('ref');
         this.field('title');
         this.field('excerpt');
@@ -32,7 +32,7 @@ window.onload = function () {
 
           // Loop through all the items in the JSON file and add them to the index
           // so they can be searched.
-        documents.forEach(function(doc) {
+        searchDocuments.forEach(function(doc) {
             this.add(doc);
             resultDetails[doc.ref] = {
                 'title': doc.title,
@@ -41,12 +41,12 @@ window.onload = function () {
         }, this);
         });
     } else {
-        $searchResults.innerHTML = 'Error loading search results';
+        $searchResults.innerHTML = '<ul><li>Error loading search results</li></ul>';
     }
     };
 
     request.onerror = function() {
-    $searchResults.innerHTML = 'Error loading search results';
+    $searchResults.innerHTML = '<ul><li>Error loading search results</li></ul>';
     };
 
     // Send the request to load the JSON
@@ -54,7 +54,7 @@ window.onload = function () {
 
     // Register handler for the search input field
     registerSearchHandler();
-};
+});
 
 function registerSearchHandler() {
     $searchInput.oninput = function(event) {
@@ -73,12 +73,12 @@ function registerSearchHandler() {
 
 function renderSearchResults(results) {
     // Create a list of results
-    var ul = document.createElement('ul');
     if (results.length > 0) {
+    var ul = document.createElement('ul');
     results.forEach(function(result) {
         // Create result item
         var li = document.createElement('li');
-        li.innerHTML = '<a href="' + result.ref + '">' + resultDetails[result.ref].title + '</a><br>' + resultDetails[result.ref].excerpt;
+        li.innerHTML = '<a href="' + result.ref + '">' + resultDetails[result.ref].title + '</a><br>' + resultDetails[result.ref].excerpt.substring(0,100) + '...';
         ul.appendChild(li);
     });
 
@@ -89,9 +89,8 @@ function renderSearchResults(results) {
         );
     }
     } else {
-    $searchResults.innerHTML = 'No results found';
-    }
-
+        $searchResults.innerHTML = '<ul><li>No results found</li></ul>';
+        }
     // Render the list
     $searchResults.appendChild(ul);
 }
@@ -99,3 +98,7 @@ function renderSearchResults(results) {
 function search(query) {
     return idx.search(query);
 }
+// Disables enter key on input fields except textarea
+$(document).on("keydown", ":input:not(textarea)", function(event) {
+    return event.key != "Enter";
+});
