@@ -1,4 +1,4 @@
-// Adapted from code by Matt Walters https://www.mattwalters.net/posts/hugo-and-lunr/
+{{ "index.json" | absURL }// Adapted from code by Matt Walters https://www.mattwalters.net/posts/hugo-and-lunr/
 
 var idx = null;         // Lunr index
 var resultDetails = []; // Will hold the data for the search results (titles and summaries)
@@ -16,7 +16,7 @@ $(window).on('load', function() {
     $searchInput   = document.getElementById('search-input');
 
     request.overrideMimeType("application/json");
-    request.open("GET", "/index.json", true); // Request the JSON file created during build
+    request.open("GET", {{ "index.json" | absURL }}, true); // Request the JSON file created during build
     request.onload = function() {
     if (request.status >= 200 && request.status < 400) {
         // Success response received in requesting the index.json file
